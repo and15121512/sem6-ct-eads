@@ -1,4 +1,4 @@
-#ifndef MEMORY_MANAGER_HEAD_H_2021_02_18
+п»ї#ifndef MEMORY_MANAGER_HEAD_H_2021_02_18
 #define MEMORY_MANAGER_HEAD_H_2021_02_18
 
 #include <iostream>
@@ -11,13 +11,9 @@ namespace lab618
     private:
         struct block
         {
-            // Массив данных блока
             T* pdata;
-            // Адрес следующего блока
             block *pnext;
-            // Первая свободная ячейка
             int firstFreeIndex;
-            // Число заполненных ячеек
             int usedCount;
 
             int getNext(int i) const
@@ -55,7 +51,6 @@ namespace lab618
             clear();
         }
 
-        // Получить адрес нового элемента из менеджера
         T* newObject()
         {
             if (isEmpty())
@@ -76,7 +71,6 @@ namespace lab618
             return new_obj_ptr;
         }
 
-        // Освободить элемент в менеджере
         bool deleteObject(T* p)
         {
             block* pcurr_blk = blockWithPtr(p);
@@ -88,12 +82,11 @@ namespace lab618
             {
                 return false;
             }
-            freeListInsert(pcurr_blk, p);
             destructElement(p);
+            freeListInsert(pcurr_blk, p);
             return true;
         }
 
-        // Очистка данных, зависит от m_isDeleteElementsOnDestruct
         void clear()
         {
             if (isEmpty())
@@ -133,7 +126,6 @@ namespace lab618
 
     private:
 
-        // Создать новый блок данных. применяется в newObject
         block* newBlock() // <--> push to list
         {
             block* pnew_block = new block;
@@ -151,11 +143,10 @@ namespace lab618
             return pnew_block;
         }
 
-        // Освободить память блока данных. Применяется в clear
         void deleteBlock(block *p)
         {
             _ASSERT(nullptr != p);
-            delete[] p->pdata;
+            delete[] reinterpret_cast<char*>(p->pdata);
             delete p;
         }
 
@@ -227,25 +218,21 @@ namespace lab618
             return pcurr_blk;
         }
 
-        void constructElement(T* ptr)
+        inline void _stdcall constructElement(T* ptr)
         {
             memset(reinterpret_cast<void*>(ptr), 0, sizeof(T));
             ::new(reinterpret_cast<void*>(ptr)) T;
         }
 
-        void destructElement(T* ptr)
+        inline void _stdcall destructElement(T* ptr)
         {
-            ptr->T();
+            ptr->~T();
             memset(reinterpret_cast<void*>(ptr), 0, sizeof(T));
         }
 
-        // Размер блока
         int m_blkSize; // _ASSERT(m_blkSize > 0)
-        // Начало списка блоков
         block* m_pBlocks;
-        // Текущий блок
         block *m_pCurrentBlk;
-        // Удалять ли элементы при освобождении
         bool m_isDeleteElementsOnDestruct;
     };
 }; // namespace lab618
