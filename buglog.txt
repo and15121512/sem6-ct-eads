@@ -1,0 +1,4 @@
+03.03.2021, mm.h:
+  1) destructElement, "ptr->T()" --> "ptr->~T()" (just typo)
+  2) deleteBlock, added "delete (!!!)reinterpret_cast<void*>(p->pdata)" (forgot this)
+  3) MAIN BUG: deleteObject, swapped freeListPop and destructElement" (changed data by hands before accureate deleteing)
