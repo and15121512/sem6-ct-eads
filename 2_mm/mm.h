@@ -97,13 +97,19 @@ namespace lab618
             {
                 throw CException();
             }
+
+            bool* pfilled_mask = new bool[m_blkSize];
+
             block* pcurr_blk = m_pBlocks;
             for (; nullptr != pcurr_blk;)
             {
                 block* pnext = pcurr_blk->pnext;
-                deleteBlock(pcurr_blk);
+                deleteBlock(pcurr_blk, pfilled_mask);
                 pcurr_blk = pnext;
             }
+
+            delete[] pfilled_mask;
+
             m_pBlocks = nullptr;
             m_pCurrentBlk = nullptr;
         }
@@ -143,9 +149,34 @@ namespace lab618
             return pnew_block;
         }
 
-        void deleteBlock(block *p)
+        void deleteBlock(block *p, bool* pfilled_mask)
         {
             _ASSERT(nullptr != p);
+
+            if (!m_isDeleteElementsOnDestruct) 
+            {
+                delete[] reinterpret_cast<char*>(p->pdata);
+                delete p;
+                return;
+            }
+
+            for (size_t i = 0; i < m_blkSize; ++i) 
+            {
+                pfilled_mask[i] = true;
+            }
+            for (int curr = p->firstFreeIndex; -1 != curr; curr = p->getNext(curr))
+            {
+                pfilled_mask[curr] = false;
+            }
+
+            for (size_t i = 0; i < m_blkSize; ++i)
+            {
+                if (pfilled_mask[i])
+                {
+                    destructElement(p->pdata);
+                }
+            }
+
             delete[] reinterpret_cast<char*>(p->pdata);
             delete p;
         }
