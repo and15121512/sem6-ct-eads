@@ -59,7 +59,7 @@ unsigned int hashFunc(const TestStruct* pElement) {
 
 int compareFunc(const TestStruct* pElement1, const TestStruct* pElement2)
 {
-    return pElement1->key == pElement2->key;
+    return pElement1->key.compare(pElement2->key);
 }
 
 TEST_CASE("construct")

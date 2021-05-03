@@ -171,7 +171,7 @@ namespace lab618
             }
             leaf* prev = nullptr;
             leaf* curr = m_pTable[idx];
-            for (; (nullptr != curr) && !Compare(curr->pData, &element); prev = curr, curr = curr->pnext)
+            for (; (nullptr != curr) && Compare(curr->pData, &element); prev = curr, curr = curr->pnext)
             {
             }
             _ASSERT(nullptr != curr);
@@ -218,7 +218,7 @@ namespace lab618
             }
             idx = HashFunc(pElement) % m_tableSize;
             leaf* curr = m_pTable[idx];
-            for (; (nullptr != curr) && !Compare(curr->pData, pElement); curr = curr->pnext)
+            for (; (nullptr != curr) && Compare(curr->pData, pElement); curr = curr->pnext)
             {
             }
             return curr;
